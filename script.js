@@ -13,11 +13,21 @@
    MODULE 0 – PIN Wall
 ════════════════════════════════════════ */
 
-const PIN            = "2808";           // 🔴 change this
-const AUTO_LOCK_MS   = 1 * 6 * 1000;  // 30 minutes in ms
+const PIN            = "2808";
+const AUTO_LOCK_MS   = 1 * 60 * 1000;
 const STORAGE_KEY    = "docuvault_unlock_time";
 
 let pinEntered = ""; // current digit buffer
+let isChecking = false;
+
+function setUnlocked() {
+  localStorage.setItem(STORAGE_KEY, Date.now());
+  resetActivityTimer();
+}
+
+function clearUnlocked() {
+  localStorage.removeItem(STORAGE_KEY);
+}
 
 /* LOCK / UNLOCK STATE */
 
@@ -35,12 +45,15 @@ function checkLock() {
 }
 
 function showLock() {
+  document.body.classList.add("locked");
   document.getElementById("pinOverlay").classList.remove("hidden");
   document.body.style.overflow = "hidden"; // prevent background scroll
+  clearUnlocked();
   resetPinUI();
 }
 
 function hideLock() {
+  document.body.classList.remove("locked");
   document.getElementById("pinOverlay").classList.add("hidden");
   document.body.style.overflow = "";
 }
@@ -76,28 +89,42 @@ function pinClear() {
 /* PIN VALIDATION */
 
 function attemptUnlock() {
+  if (isChecking) return;
+  isChecking = true;
   if (pinEntered === PIN) {
     onUnlockSuccess();
   } else {
     onUnlockFail();
   }
+  setTimeout(() => { isChecking = false; }, 500);
 }
 
 function onUnlockSuccess() {
-  localStorage.setItem(STORAGE_KEY, Date.now());
+  setUnlocked();
+  // Turn dots green
+  for (let i = 0; i < 4; i++) {
+    document.getElementById("d" + i).classList.add("success");
+  }
 
   // Fade out the card, then hide the overlay
   const box = document.getElementById("pinBox");
+  box.style.transform = "scale(0.96)";
+  box.style.boxShadow = "0 0 0 2px rgba(34,197,94,0.4)";
   box.style.opacity = "0";
 
   setTimeout(() => {
     hideLock();
     box.style.opacity = "1"; // reset for next time
+    box.style.transform = "scale(1)";
+    box.style.boxShadow = "";
     resetPinUI();
   }, 300);
+  
 }
 
 function onUnlockFail() {
+  if (navigator.vibrate) navigator.vibrate(200);
+
   // Turn dots red
   for (let i = 0; i < 4; i++) {
     document.getElementById("d" + i).classList.add("error");
@@ -134,14 +161,18 @@ function onUnlockFail() {
 function updateDots() {
   for (let i = 0; i < 4; i++) {
     const dot = document.getElementById("d" + i);
+    dot.classList.remove("error");
+    if (dot.classList.contains("success")) continue;
     dot.classList.toggle("filled", i < pinEntered.length);
-    dot.classList.remove("error"); // clear any lingering error state
   }
 }
 
 /* Reset input buffer + dots + error message */
 function resetPinUI() {
   pinEntered = "";
+  for (let i = 0; i < 4; i++) {
+    document.getElementById("d" + i).classList.remove("success");
+  }
   updateDots();
   document.getElementById("pinError").style.opacity = "0";
 }
@@ -153,7 +184,10 @@ let activityTimer;
 
 function resetActivityTimer() {
   clearTimeout(activityTimer);
-  activityTimer = setTimeout(showLock, AUTO_LOCK_MS);
+  const start = Date.now();
+  activityTimer = setTimeout(() => {
+    if (Date.now() - start >= AUTO_LOCK_MS) showLock();
+  }, AUTO_LOCK_MS);
 }
 
 // Re-arm timer on any meaningful user interaction
@@ -171,6 +205,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key >= "0" && e.key <= "9") pinPress(e.key);
   if (e.key === "Backspace")        pinBackspace();
   if (e.key === "Escape")           pinClear();
+  if (e.key === "Enter" && pinEntered.length === 4) attemptUnlock();
 });
 
 

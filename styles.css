@@ -993,6 +993,12 @@ ul { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: all;
+}
+
+body.locked .main-content {
+  filter: blur(4px);
+  pointer-events: none;
 }
 
 .pin-overlay.hidden {
@@ -1067,6 +1073,13 @@ ul { list-style: none; }
   background: var(--red);
   border-color: var(--red);
 }
+
+/* Success state — Correct PIN */
+.dot.success {
+  background: var(--green);
+  border-color: var(--green);
+}
+
 
 /* ── Numpad grid ── */
 .pin-numpad {
