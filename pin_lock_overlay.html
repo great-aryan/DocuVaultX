@@ -1,0 +1,98 @@
+<div style="min-height:420px;background:rgba(10,15,26,0.6);display:flex;align-items:center;justify-content:center;border-radius:var(--border-radius-lg);">
+<div id="pinBox" style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:32px 28px;width:280px;text-align:center;">
+  <div style="width:44px;height:44px;border-radius:50%;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:20px;">🔐</div>
+  <p style="font-size:16px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px;">Locked</p>
+  <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 24px;">Enter your 4-digit PIN to continue</p>
+
+  <div style="display:flex;gap:12px;justify-content:center;margin-bottom:24px;">
+    <div class="dot" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+    <button class="key" onclick="press('1')">1</button>
+    <button class="key" onclick="press('2')">2</button>
+    <button class="key" onclick="press('3')">3</button>
+    <button class="key" onclick="press('4')">4</button>
+    <button class="key" onclick="press('5')">5</button>
+    <button class="key" onclick="press('6')">6</button>
+    <button class="key" onclick="press('7')">7</button>
+    <button class="key" onclick="press('8')">8</button>
+    <button class="key" onclick="press('9')">9</button>
+    <button class="key" onclick="clear_pin()" style="color:var(--color-text-secondary);font-size:13px;">Clear</button>
+    <button class="key" onclick="press('0')">0</button>
+    <button class="key" onclick="backspace()" style="font-size:18px;">⌫</button>
+  </div>
+
+  <p id="pinError" style="color:#c0392b;font-size:12px;margin-top:14px;min-height:16px;opacity:0;transition:opacity 0.2s;"></p>
+</div>
+</div>
+
+<style>
+.dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--color-border-secondary);background:transparent;transition:background 0.15s,border-color 0.15s;}
+.dot.filled{background:var(--color-text-primary);border-color:var(--color-text-primary);}
+.dot.error{background:#e24b4a;border-color:#e24b4a;}
+.key{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:14px;font-size:18px;font-weight:500;color:var(--color-text-primary);cursor:pointer;transition:background 0.1s,transform 0.1s;}
+.key:hover{background:var(--color-background-tertiary);}
+.key:active{transform:scale(0.93);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.shake{animation:shake 0.4s ease;}
+</style>
+
+<script>
+const PIN="2808";
+let entered="";
+
+function updateDots(){
+  for(let i=0;i<4;i++){
+    const d=document.getElementById('d'+i);
+    d.classList.remove('filled','error');
+    if(i<entered.length) d.classList.add('filled');
+  }
+}
+
+function press(digit){
+  if(entered.length>=4) return;
+  entered+=digit;
+  updateDots();
+  if(entered.length===4) setTimeout(attempt,120);
+}
+
+function backspace(){
+  entered=entered.slice(0,-1);
+  updateDots();
+}
+
+function clear_pin(){
+  entered="";
+  updateDots();
+}
+
+function attempt(){
+  if(entered===PIN){
+    const box=document.getElementById('pinBox');
+    box.style.transition='opacity 0.3s';
+    box.style.opacity='0';
+    setTimeout(()=>{
+      box.innerHTML='<div style="padding:20px 0;"><div style="font-size:32px;margin-bottom:12px;">✓</div><p style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0;">Unlocked</p></div>';
+      box.style.opacity='1';
+    },300);
+  } else {
+    for(let i=0;i<4;i++) document.getElementById('d'+i).classList.add('error');
+    const box=document.getElementById('pinBox');
+    box.classList.add('shake');
+    const err=document.getElementById('pinError');
+    err.textContent='Incorrect PIN. Try again.';
+    err.style.opacity='1';
+    setTimeout(()=>{
+      box.classList.remove('shake');
+      entered="";
+      updateDots();
+      for(let i=0;i<4;i++) document.getElementById('d'+i).classList.remove('error');
+    },500);
+    setTimeout(()=>{ err.style.opacity='0'; },2000);
+  }
+}
+</script>

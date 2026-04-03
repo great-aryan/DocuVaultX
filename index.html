@@ -302,6 +302,50 @@
       <div class="gdrive-note"><i class="ph-duotone ph-google-drive"></i> Downloads open your Google Drive files</div>
     </div>
   </div>
+<!-- ══════════════════════════════════════
+     PIN LOCK OVERLAY
+     - Fullscreen blur overlay
+     - 4-dot progress indicator
+     - Numpad grid (1–9, Clear, 0, ⌫)
+     - Error message slot
+  ══════════════════════════════════════ -->
+<div id="pinOverlay" class="pin-overlay">
+  <div class="pin-box" id="pinBox">
+
+    <!-- Icon + heading -->
+    <div class="pin-icon">🔐</div>
+    <p class="pin-title">Locked</p>
+    <p class="pin-subtitle">Enter your 4-digit PIN to continue</p>
+
+    <!-- Dot progress indicators -->
+    <div class="pin-dots">
+      <div class="dot" id="d0"></div>
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
+      <div class="dot" id="d3"></div>
+    </div>
+
+    <!-- Numpad -->
+    <div class="pin-numpad">
+      <button class="key" onclick="pinPress('1')">1</button>
+      <button class="key" onclick="pinPress('2')">2</button>
+      <button class="key" onclick="pinPress('3')">3</button>
+      <button class="key" onclick="pinPress('4')">4</button>
+      <button class="key" onclick="pinPress('5')">5</button>
+      <button class="key" onclick="pinPress('6')">6</button>
+      <button class="key" onclick="pinPress('7')">7</button>
+      <button class="key" onclick="pinPress('8')">8</button>
+      <button class="key" onclick="pinPress('9')">9</button>
+      <button class="key key--secondary" onclick="pinClear()">Clear</button>
+      <button class="key" onclick="pinPress('0')">0</button>
+      <button class="key key--secondary" onclick="pinBackspace()">⌫</button>
+    </div>
+
+    <!-- Error message (hidden by default) -->
+    <p id="pinError">Incorrect PIN. Try again.</p>
+
+  </div>
+</div>
 
   <script src="script.js"></script>
 </body>

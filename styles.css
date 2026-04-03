@@ -980,6 +980,154 @@ ul { list-style: none; }
 }
 
 /* ════════════════════════════════════════
+   PIN LOCK
+════════════════════════════════════════ */
+
+/* ── Overlay backdrop ── */
+.pin-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 26, 0.65);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-overlay.hidden {
+  display: none;
+}
+
+/* ── Card ── */
+.pin-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: 32px 28px;
+  width: 300px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+}
+
+/* ── Icon circle ── */
+.pin-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-size: 20px;
+}
+
+/* ── Headings ── */
+.pin-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+}
+
+.pin-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 24px;
+}
+
+/* ── Dot indicators ── */
+.pin-dots {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+/* Filled state — digit entered */
+.dot.filled {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+/* Error state — wrong PIN */
+.dot.error {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+/* ── Numpad grid ── */
+.pin-numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+/* ── Keys ── */
+.key {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.1s, transform 0.1s;
+}
+
+.key:hover {
+  background: var(--surface-3);
+}
+
+.key:active {
+  transform: scale(0.93);
+}
+
+/* Muted style for Clear / ⌫ */
+.key--secondary {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ── Error message ── */
+#pinError {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 14px;
+  min-height: 16px;         /* prevents layout jump */
+  opacity: 0;               /* hidden by default    */
+  transition: opacity 0.2s;
+}
+
+/* ── Shake animation (wrong PIN) ── */
+@keyframes pinShake {
+  0%, 100% { transform: translateX(0);    }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX( 8px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX( 5px); }
+}
+
+.pin-box.shake {
+  animation: pinShake 0.4s ease;
+}
+
+
+/* ════════════════════════════════════════
    LOADING SKELETON
 ════════════════════════════════════════ */
 .skeleton {

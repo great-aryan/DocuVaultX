@@ -10,6 +10,173 @@
 'use strict';
 
 /* ════════════════════════════════════════
+   MODULE 0 – PIN Wall
+════════════════════════════════════════ */
+
+const PIN            = "2808";           // 🔴 change this
+const AUTO_LOCK_MS   = 1 * 6 * 1000;  // 30 minutes in ms
+const STORAGE_KEY    = "docuvault_unlock_time";
+
+let pinEntered = ""; // current digit buffer
+
+/* LOCK / UNLOCK STATE */
+
+/* Called on page load — checks whether the session is still valid */
+function checkLock() {
+  const lastUnlock = localStorage.getItem(STORAGE_KEY);
+
+  if (!lastUnlock) {
+    showLock();
+    return;
+  }
+
+  const elapsed = Date.now() - parseInt(lastUnlock);
+  elapsed > AUTO_LOCK_MS ? showLock() : hideLock();
+}
+
+function showLock() {
+  document.getElementById("pinOverlay").classList.remove("hidden");
+  document.body.style.overflow = "hidden"; // prevent background scroll
+  resetPinUI();
+}
+
+function hideLock() {
+  document.getElementById("pinOverlay").classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
+/* NUMPAD INTERACTIONS */
+
+/* Called by each number button */
+function pinPress(digit) {
+  if (pinEntered.length >= 4) return; // already full
+
+  pinEntered += digit;
+  updateDots();
+
+  // Auto-submit once all 4 digits are entered
+  if (pinEntered.length === 4) {
+    setTimeout(attemptUnlock, 120); // tiny delay so last dot visibly fills
+  }
+}
+
+/* Delete last digit */
+function pinBackspace() {
+  pinEntered = pinEntered.slice(0, -1);
+  updateDots();
+}
+
+/* Wipe all digits */
+function pinClear() {
+  pinEntered = "";
+  updateDots();
+}
+
+
+/* PIN VALIDATION */
+
+function attemptUnlock() {
+  if (pinEntered === PIN) {
+    onUnlockSuccess();
+  } else {
+    onUnlockFail();
+  }
+}
+
+function onUnlockSuccess() {
+  localStorage.setItem(STORAGE_KEY, Date.now());
+
+  // Fade out the card, then hide the overlay
+  const box = document.getElementById("pinBox");
+  box.style.opacity = "0";
+
+  setTimeout(() => {
+    hideLock();
+    box.style.opacity = "1"; // reset for next time
+    resetPinUI();
+  }, 300);
+}
+
+function onUnlockFail() {
+  // Turn dots red
+  for (let i = 0; i < 4; i++) {
+    document.getElementById("d" + i).classList.add("error");
+  }
+
+  // Shake the card
+  const box = document.getElementById("pinBox");
+  box.classList.add("shake");
+
+  // Show error text
+  const err = document.getElementById("pinError");
+  err.style.opacity = "1";
+
+  // Reset after animation completes
+  setTimeout(() => {
+    box.classList.remove("shake");
+    pinEntered = "";
+    updateDots();
+    for (let i = 0; i < 4; i++) {
+      document.getElementById("d" + i).classList.remove("error");
+    }
+  }, 500);
+
+  // Fade error message out after 2s
+  setTimeout(() => {
+    err.style.opacity = "0";
+  }, 2000);
+}
+
+
+/* UI HELPERS */
+
+/* Sync dot fill state to current pinEntered length */
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById("d" + i);
+    dot.classList.toggle("filled", i < pinEntered.length);
+    dot.classList.remove("error"); // clear any lingering error state
+  }
+}
+
+/* Reset input buffer + dots + error message */
+function resetPinUI() {
+  pinEntered = "";
+  updateDots();
+  document.getElementById("pinError").style.opacity = "0";
+}
+
+
+/* AUTO-LOCK ON INACTIVITY */
+
+let activityTimer;
+
+function resetActivityTimer() {
+  clearTimeout(activityTimer);
+  activityTimer = setTimeout(showLock, AUTO_LOCK_MS);
+}
+
+// Re-arm timer on any meaningful user interaction
+["click", "mousemove", "keydown", "scroll", "touchstart"].forEach(evt => {
+  document.addEventListener(evt, resetActivityTimer, { passive: true });
+});
+
+
+/* KEYBOARD SUPPORT */
+
+document.addEventListener("keydown", (e) => {
+  // Ignore keyboard input when overlay is hidden
+  if (document.getElementById("pinOverlay").classList.contains("hidden")) return;
+
+  if (e.key >= "0" && e.key <= "9") pinPress(e.key);
+  if (e.key === "Backspace")        pinBackspace();
+  if (e.key === "Escape")           pinClear();
+});
+
+
+
+
+/* ════════════════════════════════════════
    MODULE 1 – APP STATE
 ════════════════════════════════════════ */
 const State = {
@@ -582,7 +749,7 @@ function renderDocumentTable() {
           <button class="act-btn" title="View Details" onclick="openModal('${doc.DocumentID}')">
             <i class="ph-duotone ph-eye"></i>
           </button>
-          ${dlCount > 0 ? `<button class="act-btn dl-btn" title="Downloads available" onclick="openModal('${doc.DocumentID}')">
+          ${dlCount > 0 ? `<button class="act-btn dl-btn" title="Download Options" onclick="openDownloadModal('${doc.DocumentID}')">
             <i class="ph-duotone ph-download-simple"></i>
           </button>` : ''}
         </div>
@@ -810,6 +977,58 @@ function closeModal() {
   document.body.style.overflow = '';
 }
 
+function openDownloadModal(docId) {
+  const doc = State.allDocs.find(d => d.DocumentID === docId);
+  if (!doc || !doc.GDrive) return;
+
+  document.getElementById('modalCat').textContent  = doc.Category;
+  document.getElementById('modalName').textContent = doc.Name + ' — Downloads';
+
+  const catColor = CATEGORY_COLORS[doc.Category] || '#64748b';
+  document.getElementById('modalCat').style.cssText =
+    `background:${hexWithAlpha(catColor,0.15)};color:${catColor};`;
+
+  const pdfKeys = Object.keys(doc.GDrive).filter(k => k.startsWith('pdf'));
+  const jpgKeys = Object.keys(doc.GDrive).filter(k => k.startsWith('jpg'));
+
+  const buildGroup = (keys, groupLabel, groupColor, groupIcon) => {
+    if (keys.length === 0) return '';
+
+    const btns = keys.map(key => {
+      const meta = GDRIVE_META[key] || { label: key, icon: 'ph-file', size: key };
+
+      return `
+        <a href="${escapeHtml(doc.GDrive[key])}" target="_blank"
+           class="dl-pill" title="Download ${meta.label}">
+          <i class="ph-duotone ${meta.icon}"></i>
+          <span class="dl-pill-size">${meta.size}</span>
+        </a>`;
+    }).join('');
+
+    return `
+      <div class="dl-group">
+        <div class="dl-group-label">
+          <i class="ph-bold ${groupIcon}" style="color:${groupColor};"></i>
+          ${groupLabel}
+        </div>
+        <div class="dl-pills">${btns}</div>
+      </div>`;
+  };
+
+  // 👇 ONLY DOWNLOAD PANEL (NO DETAILS)
+  document.getElementById('modalBody').innerHTML = `
+    <div class="download-panel">
+      ${buildGroup(pdfKeys, 'PDF', '#ef4444', 'ph-file-pdf')}
+      ${buildGroup(jpgKeys, 'JPG / Image', '#3b82f6', 'ph-file-image')}
+    </div>
+  `;
+
+  document.getElementById('modalBackdrop').classList.add('open');
+  document.getElementById('docModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+
 /* ════════════════════════════════════════
    MODULE 17 – EXPORT CSV
 ════════════════════════════════════════ */
@@ -905,4 +1124,8 @@ document.addEventListener('keydown', e => {
 /* ════════════════════════════════════════
    BOOT
 ════════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', loadData);
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  checkLock();
+  resetActivityTimer();
+});
