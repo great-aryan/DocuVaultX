@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DocuVault – Personal Document Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       MOBILE OVERLAY (closes sidebar)
+  ══════════════════════════════════════ -->
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- ══════════════════════════════════════
+       SIDEBAR NAVIGATION
+  ══════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="ph-duotone ph-vault"></i></div>
+      <div class="brand-text">
+        <span class="brand-name">DocuVault</span>
+        <span class="brand-sub">Personal Document Hub</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="nav-section-label">MAIN</span>
+      <a class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <i class="ph-duotone ph-squares-four"></i> Dashboard
+      </a>
+      <a class="nav-item" data-page="documents" onclick="navigate('documents')">
+        <i class="ph-duotone ph-files"></i> Documents
+        <span class="nav-badge" id="totalBadge">0</span>
+      </a>
+      <a class="nav-item" data-page="alerts" onclick="navigate('alerts')">
+        <i class="ph-duotone ph-bell-ringing"></i> Alerts
+        <span class="nav-badge danger" id="alertBadge">0</span>
+      </a>
+
+      <span class="nav-section-label" style="margin-top:1.5rem;">CATEGORIES</span>
+      <div class="category-pills" id="categoryPills"></div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+        <i class="ph-duotone ph-moon" id="themeIcon"></i>
+        <span id="themeLabel">Dark Mode</span>
+      </button>
+      <div class="sidebar-version">v1.0.0 · Local Build</div>
+    </div>
+  </aside>
+
+  <!-- ══════════════════════════════════════
+       MAIN CONTENT AREA
+  ══════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" onclick="toggleSidebar()">
+          <i class="ph-bold ph-list"></i>
+        </button>
+        <div class="page-title" id="pageTitle">
+          <h1>Dashboard</h1>
+          <span id="pageSub">Overview of your document vault</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <!-- Global Search -->
+        <div class="search-wrap">
+          <i class="ph-bold ph-magnifying-glass search-icon"></i>
+          <input type="text" id="globalSearch" placeholder="Search documents…" oninput="handleSearch()" autocomplete="off"/>
+          <span class="search-clear" id="searchClear" onclick="clearSearch()">
+            <i class="ph-bold ph-x"></i>
+          </span>
+        </div>
+        <!-- Sensitive toggle -->
+        <button class="icon-btn tooltip-wrap" id="sensitiveToggle" onclick="toggleSensitive()">
+          <i class="ph-duotone ph-eye" id="sensitiveIcon"></i>
+          <span class="tooltip">Hide Sensitive Fields</span>
+        </button>
+        <!-- Export -->
+        <button class="icon-btn tooltip-wrap" onclick="exportCSV()">
+          <i class="ph-duotone ph-download-simple"></i>
+          <span class="tooltip">Export CSV</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ──────────────────────────────
+         PAGE: DASHBOARD
+    ────────────────────────────── -->
+    <section class="page active" id="page-dashboard">
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <div class="stat-card" data-type="total" onclick="navigate('documents')">
+          <div class="stat-icon teal"><i class="ph-duotone ph-files"></i></div>
+          <div class="stat-info">
+            <span class="stat-num" id="statTotal">0</span>
+            <span class="stat-label">Total Documents</span>
+          </div>
+          <div class="stat-arrow"><i class="ph-bold ph-arrow-right"></i></div>
+        </div>
+        <div class="stat-card" data-type="high" onclick="filterAndGo('Priority','High')">
+          <div class="stat-icon red"><i class="ph-duotone ph-warning-diamond"></i></div>
+          <div class="stat-info">
+            <span class="stat-num" id="statHigh">0</span>
+            <span class="stat-label">High Priority</span>
+          </div>
+          <div class="stat-arrow"><i class="ph-bold ph-arrow-right"></i></div>
+        </div>
+        <div class="stat-card" data-type="soon" onclick="filterAndGo('ExpiryStatus','Expiring Soon')">
+          <div class="stat-icon amber"><i class="ph-duotone ph-clock-countdown"></i></div>
+          <div class="stat-info">
+            <span class="stat-num" id="statSoon">0</span>
+            <span class="stat-label">Expiring Soon</span>
+          </div>
+          <div class="stat-arrow"><i class="ph-bold ph-arrow-right"></i></div>
+        </div>
+        <div class="stat-card" data-type="expired" onclick="filterAndGo('ExpiryStatus','Expired')">
+          <div class="stat-icon crimson"><i class="ph-duotone ph-x-circle"></i></div>
+          <div class="stat-info">
+            <span class="stat-num" id="statExpired">0</span>
+            <span class="stat-label">Expired</span>
+          </div>
+          <div class="stat-arrow"><i class="ph-bold ph-arrow-right"></i></div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3><i class="ph-duotone ph-chart-pie-slice"></i> By Category</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3><i class="ph-duotone ph-chart-bar"></i> By Priority</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="priorityChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card wide">
+          <div class="chart-header">
+            <h3><i class="ph-duotone ph-trend-up"></i> Upcoming Expiries Timeline</h3>
+          </div>
+          <div class="chart-body">
+            <canvas id="expiryChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent + Alerts Row -->
+      <div class="bottom-row">
+        <!-- Recent Documents -->
+        <div class="mini-card">
+          <div class="mini-header">
+            <h3><i class="ph-duotone ph-clock-clockwise"></i> Recently Updated</h3>
+            <a onclick="navigate('documents')" class="see-all">See all →</a>
+          </div>
+          <ul class="mini-list" id="recentList"></ul>
+        </div>
+        <!-- Quick Alerts -->
+        <div class="mini-card">
+          <div class="mini-header">
+            <h3><i class="ph-duotone ph-bell-ringing"></i> Active Alerts</h3>
+            <a onclick="navigate('alerts')" class="see-all">See all →</a>
+          </div>
+          <ul class="mini-list" id="quickAlertList"></ul>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────
+         PAGE: DOCUMENTS
+    ────────────────────────────── -->
+    <section class="page" id="page-documents">
+
+      <!-- Filters Bar -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label><i class="ph-bold ph-funnel"></i> Category</label>
+          <select id="filterCategory" onchange="applyFilters()">
+            <option value="">All Categories</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label><i class="ph-bold ph-warning"></i> Priority</label>
+          <select id="filterPriority" onchange="applyFilters()">
+            <option value="">All Priorities</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label><i class="ph-bold ph-calendar-x"></i> Expiry Status</label>
+          <select id="filterExpiry" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option>Valid</option>
+            <option>Expiring Soon</option>
+            <option>Expired</option>
+            <option>No Expiry</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label><i class="ph-bold ph-activity"></i> Status</label>
+          <select id="filterStatus" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option>Done</option>
+            <option>Pending</option>
+            <option>Updating</option>
+          </select>
+        </div>
+        <button class="clear-btn" onclick="clearFilters()">
+          <i class="ph-bold ph-x"></i> Clear
+        </button>
+      </div>
+
+      <!-- Results info -->
+      <div class="results-bar">
+        <span id="resultsCount">Showing 0 documents</span>
+        <div class="sort-info">Click column headers to sort</div>
+      </div>
+
+      <!-- Table Wrapper -->
+      <div class="table-wrap">
+        <table class="doc-table" id="docTable">
+          <thead>
+            <tr>
+              <th data-col="DocumentID" onclick="sortTable('DocumentID')">#<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="Name" onclick="sortTable('Name')">Name<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="Category" onclick="sortTable('Category')">Category<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="Priority" onclick="sortTable('Priority')">Priority<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="Status" onclick="sortTable('Status')">Status<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="Authority" onclick="sortTable('Authority')">Authority<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="DocumentNumber" class="sensitive-field">Doc Number<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="HolderName" onclick="sortTable('HolderName')">Holder<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="ExpiryDate" onclick="sortTable('ExpiryDate')">Expiry<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="ExpiryStatus" onclick="sortTable('ExpiryStatus')">Expiry Status<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="docTableBody"></tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ──────────────────────────────
+         PAGE: ALERTS
+    ────────────────────────────── -->
+    <section class="page" id="page-alerts">
+
+      <div class="alerts-wrapper">
+        <!-- Expired -->
+        <div class="alert-section">
+          <div class="alert-section-header expired">
+            <i class="ph-duotone ph-x-circle"></i>
+            <h2>Expired Documents</h2>
+            <span class="alert-count" id="expiredCountBadge">0</span>
+          </div>
+          <div class="alert-cards" id="expiredCards"></div>
+        </div>
+
+        <!-- Expiring Soon -->
+        <div class="alert-section">
+          <div class="alert-section-header expiring">
+            <i class="ph-duotone ph-clock-countdown"></i>
+            <h2>Expiring Soon</h2>
+            <span class="alert-count warning" id="soonCountBadge">0</span>
+          </div>
+          <div class="alert-cards" id="soonCards"></div>
+        </div>
+
+        <!-- Pending -->
+        <div class="alert-section">
+          <div class="alert-section-header pending-hdr">
+            <i class="ph-duotone ph-hourglass-medium"></i>
+            <h2>Pending Action</h2>
+            <span class="alert-count info" id="pendingCountBadge">0</span>
+          </div>
+          <div class="alert-cards" id="pendingCards"></div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ══════════════════════════════════════
+       DOCUMENT DETAIL MODAL
+  ══════════════════════════════════════ -->
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
+  <div class="modal" id="docModal">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-cat-badge" id="modalCat"></span>
+        <h2 id="modalName"></h2>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Close</button>
+      <div class="gdrive-note"><i class="ph-duotone ph-google-drive"></i> Google Drive links in Notes field</div>
+    </div>
+  </div>
+
+  <!-- Main script -->
+  <script src="script.js"></script>
+</body>
+</html>
