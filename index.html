@@ -5,16 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>DocuVault – Personal Document Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-  <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js"></script>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════
-       MOBILE OVERLAY (closes sidebar)
-  ══════════════════════════════════════ -->
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
   <!-- ══════════════════════════════════════
@@ -52,7 +47,7 @@
         <i class="ph-duotone ph-moon" id="themeIcon"></i>
         <span id="themeLabel">Dark Mode</span>
       </button>
-      <div class="sidebar-version">v1.0.0 · Local Build</div>
+      <div class="sidebar-version">v1.1.0 · Local Build</div>
     </div>
   </aside>
 
@@ -73,20 +68,17 @@
         </div>
       </div>
       <div class="topbar-right">
-        <!-- Global Search -->
         <div class="search-wrap">
           <i class="ph-bold ph-magnifying-glass search-icon"></i>
-          <input type="text" id="globalSearch" placeholder="Search documents…" oninput="handleSearch()" autocomplete="off"/>
+          <input type="text" id="globalSearch" placeholder="Search… (Ctrl+K)" oninput="handleSearch()" autocomplete="off"/>
           <span class="search-clear" id="searchClear" onclick="clearSearch()">
             <i class="ph-bold ph-x"></i>
           </span>
         </div>
-        <!-- Sensitive toggle -->
         <button class="icon-btn tooltip-wrap" id="sensitiveToggle" onclick="toggleSensitive()">
           <i class="ph-duotone ph-eye" id="sensitiveIcon"></i>
           <span class="tooltip">Hide Sensitive Fields</span>
         </button>
-        <!-- Export -->
         <button class="icon-btn tooltip-wrap" onclick="exportCSV()">
           <i class="ph-duotone ph-download-simple"></i>
           <span class="tooltip">Export CSV</span>
@@ -99,7 +91,6 @@
     ────────────────────────────── -->
     <section class="page active" id="page-dashboard">
 
-      <!-- Stat Cards -->
       <div class="stats-grid">
         <div class="stat-card" data-type="total" onclick="navigate('documents')">
           <div class="stat-icon teal"><i class="ph-duotone ph-files"></i></div>
@@ -135,37 +126,28 @@
         </div>
       </div>
 
-      <!-- Charts Row -->
       <div class="charts-row">
         <div class="chart-card">
           <div class="chart-header">
             <h3><i class="ph-duotone ph-chart-pie-slice"></i> By Category</h3>
           </div>
-          <div class="chart-body">
-            <canvas id="categoryChart"></canvas>
-          </div>
+          <div class="chart-body"><canvas id="categoryChart"></canvas></div>
         </div>
         <div class="chart-card">
           <div class="chart-header">
             <h3><i class="ph-duotone ph-chart-bar"></i> By Priority</h3>
           </div>
-          <div class="chart-body">
-            <canvas id="priorityChart"></canvas>
-          </div>
+          <div class="chart-body"><canvas id="priorityChart"></canvas></div>
         </div>
         <div class="chart-card wide">
           <div class="chart-header">
             <h3><i class="ph-duotone ph-trend-up"></i> Upcoming Expiries Timeline</h3>
           </div>
-          <div class="chart-body">
-            <canvas id="expiryChart"></canvas>
-          </div>
+          <div class="chart-body"><canvas id="expiryChart"></canvas></div>
         </div>
       </div>
 
-      <!-- Recent + Alerts Row -->
       <div class="bottom-row">
-        <!-- Recent Documents -->
         <div class="mini-card">
           <div class="mini-header">
             <h3><i class="ph-duotone ph-clock-clockwise"></i> Recently Updated</h3>
@@ -173,7 +155,6 @@
           </div>
           <ul class="mini-list" id="recentList"></ul>
         </div>
-        <!-- Quick Alerts -->
         <div class="mini-card">
           <div class="mini-header">
             <h3><i class="ph-duotone ph-bell-ringing"></i> Active Alerts</h3>
@@ -187,10 +168,11 @@
 
     <!-- ──────────────────────────────
          PAGE: DOCUMENTS
+         Table has 8 focused columns.
+         Click row to see all details.
     ────────────────────────────── -->
     <section class="page" id="page-documents">
 
-      <!-- Filters Bar -->
       <div class="filter-bar">
         <div class="filter-group">
           <label><i class="ph-bold ph-funnel"></i> Category</label>
@@ -231,26 +213,32 @@
         </button>
       </div>
 
-      <!-- Results info -->
       <div class="results-bar">
         <span id="resultsCount">Showing 0 documents</span>
-        <div class="sort-info">Click column headers to sort</div>
+        <div class="sort-info"><i class="ph-bold ph-info" style="vertical-align:middle;margin-right:4px;"></i>Click any column to sort · Click row for full details &amp; downloads</div>
       </div>
 
-      <!-- Table Wrapper -->
+      <!-- Table: 8 columns — fits screen without horizontal scroll -->
       <div class="table-wrap">
         <table class="doc-table" id="docTable">
+          <colgroup>
+            <col style="width:44px">
+            <col><!-- Name: flexible -->
+            <col style="width:100px">
+            <col style="width:90px">
+            <col style="width:88px">
+            <col style="width:100px">
+            <col style="width:126px">
+            <col style="width:76px">
+          </colgroup>
           <thead>
             <tr>
               <th data-col="DocumentID" onclick="sortTable('DocumentID')">#<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
-              <th data-col="Name" onclick="sortTable('Name')">Name<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="Name" onclick="sortTable('Name')">Name / Type<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
               <th data-col="Category" onclick="sortTable('Category')">Category<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
               <th data-col="Priority" onclick="sortTable('Priority')">Priority<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
               <th data-col="Status" onclick="sortTable('Status')">Status<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
-              <th data-col="Authority" onclick="sortTable('Authority')">Authority<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
-              <th data-col="DocumentNumber" class="sensitive-field">Doc Number<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
-              <th data-col="HolderName" onclick="sortTable('HolderName')">Holder<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
-              <th data-col="ExpiryDate" onclick="sortTable('ExpiryDate')">Expiry<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
+              <th data-col="ExpiryDate" onclick="sortTable('ExpiryDate')">Expiry Date<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
               <th data-col="ExpiryStatus" onclick="sortTable('ExpiryStatus')">Expiry Status<i class="ph-bold ph-caret-up-down sort-icon"></i></th>
               <th>Actions</th>
             </tr>
@@ -265,9 +253,7 @@
          PAGE: ALERTS
     ────────────────────────────── -->
     <section class="page" id="page-alerts">
-
       <div class="alerts-wrapper">
-        <!-- Expired -->
         <div class="alert-section">
           <div class="alert-section-header expired">
             <i class="ph-duotone ph-x-circle"></i>
@@ -276,8 +262,6 @@
           </div>
           <div class="alert-cards" id="expiredCards"></div>
         </div>
-
-        <!-- Expiring Soon -->
         <div class="alert-section">
           <div class="alert-section-header expiring">
             <i class="ph-duotone ph-clock-countdown"></i>
@@ -286,8 +270,6 @@
           </div>
           <div class="alert-cards" id="soonCards"></div>
         </div>
-
-        <!-- Pending -->
         <div class="alert-section">
           <div class="alert-section-header pending-hdr">
             <i class="ph-duotone ph-hourglass-medium"></i>
@@ -297,13 +279,13 @@
           <div class="alert-cards" id="pendingCards"></div>
         </div>
       </div>
-
     </section>
 
   </main>
 
   <!-- ══════════════════════════════════════
        DOCUMENT DETAIL MODAL
+       (includes Download Panel)
   ══════════════════════════════════════ -->
   <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal()"></div>
   <div class="modal" id="docModal">
@@ -317,11 +299,10 @@
     <div class="modal-body" id="modalBody"></div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal()">Close</button>
-      <div class="gdrive-note"><i class="ph-duotone ph-google-drive"></i> Google Drive links in Notes field</div>
+      <div class="gdrive-note"><i class="ph-duotone ph-google-drive"></i> Downloads open your Google Drive files</div>
     </div>
   </div>
 
-  <!-- Main script -->
   <script src="script.js"></script>
 </body>
 </html>

@@ -18,6 +18,19 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_pdfOG",
+      "pdf2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_pdf2047",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_jpgOG",
+      "jpg2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_jpg2047",
+      "jpg1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_jpg1023",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_001_jpg19"
+    },
     "Notes": "10-year validity. Keep 2 photocopies."
   },
   {
@@ -39,6 +52,13 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_002_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_002_pdf99",
+      "jpgOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_002_jpgOG",
+      "jpg99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_002_jpg99",
+      "jpg19kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_002_jpg19"
+    },
     "Notes": "Linked with mobile. Update address if moved."
   },
   {
@@ -60,6 +80,15 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":    "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_003_pdfOG",
+      "pdf499kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_003_pdf499",
+      "pdf99kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_003_pdf99",
+      "jpgOG":    "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_003_jpgOG",
+      "jpg499kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_003_jpg499",
+      "jpg99kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_003_jpg99",
+      "jpg19kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_003_jpg19"
+    },
     "Notes": "Required for income tax filing and financial transactions."
   },
   {
@@ -81,6 +110,17 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_pdfOG",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_jpgOG",
+      "jpg1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_jpg1023",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_004_jpg19"
+    },
     "Notes": "Valid for LMV + Motorcycle."
   },
   {
@@ -102,6 +142,13 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_005_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_005_pdf99",
+      "jpgOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_005_jpgOG",
+      "jpg99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_005_jpg99",
+      "jpg19kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_005_jpg19"
+    },
     "Notes": "Verify booth number before election."
   },
   {
@@ -123,6 +170,19 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_pdfOG",
+      "pdf2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_pdf2047",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_jpgOG",
+      "jpg2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_jpg2047",
+      "jpg1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_jpg1023",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_006_jpg19"
+    },
     "Notes": "Premium due: June 1 every year. Sum assured: 25L."
   },
   {
@@ -144,6 +204,12 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_007_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_007_pdf99",
+      "jpgOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_007_jpgOG",
+      "jpg99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_007_jpg99"
+    },
     "Notes": "Family floater plan. Renewal due April 1. Hospital network list attached."
   },
   {
@@ -165,6 +231,10 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_008_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_008_pdf99"
+    },
     "Notes": "Car insurance for Swift Dzire MH01-AB-1234. RENEW IMMEDIATELY."
   },
   {
@@ -186,6 +256,19 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_pdfOG",
+      "pdf2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_pdf2047",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_jpgOG",
+      "jpg2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_jpg2047",
+      "jpg1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_jpg1023",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_009_jpg19"
+    },
     "Notes": "Sale deed. Original stored in bank locker."
   },
   {
@@ -207,6 +290,12 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_010_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_010_pdf99",
+      "jpgOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_010_jpgOG",
+      "jpg99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_010_jpg99"
+    },
     "Notes": "Primary salary account. Linked to UPI."
   },
   {
@@ -228,6 +317,16 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_pdfOG",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_jpgOG",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_011_jpg19"
+    },
     "Notes": "Original + 3 attested copies in file."
   },
   {
@@ -249,6 +348,13 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_012_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_012_pdf99",
+      "jpgOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_012_jpgOG",
+      "jpg99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_012_jpg99",
+      "jpg19kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_012_jpg19"
+    },
     "Notes": "Scanned copy uploaded to Google Drive."
   },
   {
@@ -270,6 +376,13 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_013_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_013_pdf99",
+      "jpgOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_013_jpgOG",
+      "jpg99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_013_jpg99",
+      "jpg19kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_013_jpg19"
+    },
     "Notes": "Scanned copy uploaded to Google Drive."
   },
   {
@@ -291,6 +404,19 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_pdfOG",
+      "pdf2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_pdf2047",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_jpgOG",
+      "jpg2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_jpg2047",
+      "jpg1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_jpg1023",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_014_jpg19"
+    },
     "Notes": "B.Com degree. Original in locker."
   },
   {
@@ -312,6 +438,19 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_pdfOG",
+      "pdf2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_pdf2047",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_jpgOG",
+      "jpg2047kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_jpg2047",
+      "jpg1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_jpg1023",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_015_jpg19"
+    },
     "Notes": "EMI: ₹22,500/month. 15-year tenure."
   },
   {
@@ -333,6 +472,10 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_016_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_016_pdf99"
+    },
     "Notes": "UAN linked. Check balance on EPFO portal."
   },
   {
@@ -354,6 +497,10 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_017_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_017_pdf99"
+    },
     "Notes": "ITR-1 filed online. Acknowledgement saved."
   },
   {
@@ -375,6 +522,10 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_018_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_018_pdf99"
+    },
     "Notes": "Consumer no. saved. Auto-pay enabled."
   },
   {
@@ -396,6 +547,13 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_019_pdfOG",
+      "pdf99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_019_pdf99",
+      "jpgOG":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_019_jpgOG",
+      "jpg99kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_019_jpg99",
+      "jpg19kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_019_jpg19"
+    },
     "Notes": "Renew every 6 months. Visit petrol station."
   },
   {
@@ -417,6 +575,17 @@
     "FathersName": "Suresh Sharma",
     "Contact": "+91-9876543210",
     "Email": "raj.sharma@email.com",
+    "GDrive": {
+      "pdfOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_pdfOG",
+      "pdf1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_pdf1023",
+      "pdf499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_pdf499",
+      "pdf99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_pdf99",
+      "jpgOG":     "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_jpgOG",
+      "jpg1023kb": "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_jpg1023",
+      "jpg499kb":  "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_jpg499",
+      "jpg99kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_jpg99",
+      "jpg19kb":   "https://drive.google.com/uc?export=download&id=EXAMPLE_ID_020_jpg19"
+    },
     "Notes": "Smart card RC. Keep original in car."
   }
 ]

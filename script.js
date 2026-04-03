@@ -1,9 +1,9 @@
 /**
  * ═══════════════════════════════════════════════════════════════
  *  DocuVault – script.js
- *  Author: Senior Full Stack Developer
  *  Description: All application logic for the DocuVault dashboard.
  *               Modular, well-commented, and easy to extend.
+ *  v1.1.0 – Added: GDrive download panel, table scroll fix
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -11,31 +11,28 @@
 
 /* ════════════════════════════════════════
    MODULE 1 – APP STATE
-   Central state object for the app.
 ════════════════════════════════════════ */
 const State = {
-  allDocs:        [],           // Raw data from JSON
-  filteredDocs:   [],           // After search + filters
-  currentPage:    'dashboard',  // Active nav page
-  sortKey:        'DocumentID', // Column to sort by
-  sortDir:        'asc',        // 'asc' | 'desc'
-  search:         '',           // Global search query
+  allDocs:        [],
+  filteredDocs:   [],
+  currentPage:    'dashboard',
+  sortKey:        'DocumentID',
+  sortDir:        'asc',
+  search:         '',
   filters: {
     Category:     '',
     Priority:     '',
     ExpiryStatus: '',
     Status:       ''
   },
-  sensitive:      false,        // Hide sensitive fields?
-  charts:         {},           // Chart.js instances
-  theme:          'light'       // 'light' | 'dark'
+  sensitive:      false,
+  charts:         {},
+  theme:          'light'
 };
 
 /* ════════════════════════════════════════
    MODULE 2 – CONSTANTS & CONFIG
 ════════════════════════════════════════ */
-
-/** Category → color mapping for charts and pills */
 const CATEGORY_COLORS = {
   'Identity':  '#0d9488',
   'Financial': '#3b82f6',
@@ -46,27 +43,35 @@ const CATEGORY_COLORS = {
   'Utility':   '#64748b',
 };
 
-/** Days threshold for "Expiring Soon" auto-calculation */
 const EXPIRY_SOON_DAYS = 90;
 
-/** Fields considered sensitive */
-const SENSITIVE_FIELDS = ['DocumentNumber', 'Contact', 'Email'];
+/**
+ * GDrive key → human-readable label + icon mapping.
+ * Grouped as PDF or JPG for the download panel.
+ */
+const GDRIVE_META = {
+  pdfOG:     { label: 'PDF – Original',     icon: 'ph-file-pdf',   group: 'pdf', size: 'Original' },
+  pdf2047kb: { label: 'PDF – ≤2 MB',        icon: 'ph-file-pdf',   group: 'pdf', size: '≤2 MB' },
+  pdf1023kb: { label: 'PDF – ≤1 MB',        icon: 'ph-file-pdf',   group: 'pdf', size: '≤1 MB' },
+  pdf499kb:  { label: 'PDF – ≤500 KB',      icon: 'ph-file-pdf',   group: 'pdf', size: '≤500 KB' },
+  pdf99kb:   { label: 'PDF – ≤100 KB',      icon: 'ph-file-pdf',   group: 'pdf', size: '≤100 KB' },
+  jpgOG:     { label: 'JPG – Original',     icon: 'ph-file-image', group: 'jpg', size: 'Original' },
+  jpg2047kb: { label: 'JPG – ≤2 MB',        icon: 'ph-file-image', group: 'jpg', size: '≤2 MB' },
+  jpg1023kb: { label: 'JPG – ≤1 MB',        icon: 'ph-file-image', group: 'jpg', size: '≤1 MB' },
+  jpg499kb:  { label: 'JPG – ≤500 KB',      icon: 'ph-file-image', group: 'jpg', size: '≤500 KB' },
+  jpg99kb:   { label: 'JPG – ≤100 KB',      icon: 'ph-file-image', group: 'jpg', size: '≤100 KB' },
+  jpg19kb:   { label: 'JPG – ≤20 KB',       icon: 'ph-file-image', group: 'jpg', size: '≤20 KB' },
+};
 
 /* ════════════════════════════════════════
    MODULE 3 – DATA LOADING
 ════════════════════════════════════════ */
-
-/**
- * Loads data.json, auto-calculates ExpiryStatus,
- * then kicks off the entire dashboard render.
- */
 async function loadData() {
   try {
     const response = await fetch('data.json');
     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
     const raw = await response.json();
 
-    // Auto-calculate ExpiryStatus based on Expiry Date
     State.allDocs = raw.map(doc => ({
       ...doc,
       ExpiryStatus: calcExpiryStatus(doc.ExpiryDate)
@@ -84,19 +89,13 @@ async function loadData() {
   }
 }
 
-/**
- * Auto-calculates expiry status from a date string.
- * @param {string} dateStr – ISO date string (YYYY-MM-DD)
- * @returns {string} – 'Expired' | 'Expiring Soon' | 'Valid' | 'No Expiry'
- */
 function calcExpiryStatus(dateStr) {
   if (!dateStr || dateStr.trim() === '') return 'No Expiry';
   const expiry = new Date(dateStr);
   const now    = new Date();
   const diffMs = expiry - now;
   const diffDays = diffMs / (1000 * 60 * 60 * 24);
-
-  if (diffDays < 0)               return 'Expired';
+  if (diffDays < 0)                return 'Expired';
   if (diffDays <= EXPIRY_SOON_DAYS) return 'Expiring Soon';
   return 'Valid';
 }
@@ -104,8 +103,6 @@ function calcExpiryStatus(dateStr) {
 /* ════════════════════════════════════════
    MODULE 4 – INITIALIZATION
 ════════════════════════════════════════ */
-
-/** Main init: called once after data is loaded */
 function initApp() {
   loadPreferences();
   populateFilterDropdowns();
@@ -116,7 +113,6 @@ function initApp() {
   updateBadges();
 }
 
-/** Load saved preferences from localStorage */
 function loadPreferences() {
   const saved = localStorage.getItem('docuvault_prefs');
   if (saved) {
@@ -131,11 +127,10 @@ function loadPreferences() {
         State.sensitive = prefs.sensitive;
         updateSensitiveUI();
       }
-    } catch (e) {/* ignore corrupt prefs */}
+    } catch (e) { /* ignore corrupt prefs */ }
   }
 }
 
-/** Save preferences to localStorage */
 function savePreferences() {
   localStorage.setItem('docuvault_prefs', JSON.stringify({
     theme:     State.theme,
@@ -146,25 +141,14 @@ function savePreferences() {
 /* ════════════════════════════════════════
    MODULE 5 – NAVIGATION
 ════════════════════════════════════════ */
-
-/**
- * Navigate to a named page.
- * @param {string} page – 'dashboard' | 'documents' | 'alerts'
- */
 function navigate(page) {
   State.currentPage = page;
-
-  // Update nav items
   document.querySelectorAll('.nav-item').forEach(el => {
     el.classList.toggle('active', el.dataset.page === page);
   });
-
-  // Show/hide page sections
   document.querySelectorAll('.page').forEach(el => {
     el.classList.toggle('active', el.id === `page-${page}`);
   });
-
-  // Update topbar title
   const titles = {
     dashboard: { h: 'Dashboard',  sub: 'Overview of your document vault' },
     documents: { h: 'Documents',  sub: 'Browse, search & filter all documents' },
@@ -173,11 +157,9 @@ function navigate(page) {
   const t = titles[page] || titles.dashboard;
   document.getElementById('pageTitle').querySelector('h1').textContent = t.h;
   document.getElementById('pageSub').textContent = t.sub;
-
   closeSidebar();
 }
 
-/** Navigate to Documents tab and pre-apply a filter */
 function filterAndGo(field, value) {
   const map = {
     Priority:     'filterPriority',
@@ -213,7 +195,6 @@ function toggleTheme() {
   document.documentElement.setAttribute('data-theme', State.theme);
   updateThemeUI();
   savePreferences();
-  // Re-render charts with new theme colors
   destroyCharts();
   renderCharts();
 }
@@ -230,7 +211,7 @@ function updateThemeUI() {
 function toggleSensitive() {
   State.sensitive = !State.sensitive;
   updateSensitiveUI();
-  renderDocumentTable(); // Re-render table to apply/remove blur
+  renderDocumentTable();
   savePreferences();
 }
 
@@ -251,8 +232,6 @@ function updateSensitiveUI() {
 /* ════════════════════════════════════════
    MODULE 9 – SEARCH
 ════════════════════════════════════════ */
-
-/** Search across Name, Category, DocumentID, Authority, HolderName */
 function handleSearch() {
   State.search = document.getElementById('globalSearch').value.trim().toLowerCase();
   const clear = document.getElementById('searchClear');
@@ -270,8 +249,6 @@ function clearSearch() {
 /* ════════════════════════════════════════
    MODULE 10 – FILTERS
 ════════════════════════════════════════ */
-
-/** Read filter dropdowns and apply to State.filteredDocs */
 function applyFilters() {
   State.filters.Category     = document.getElementById('filterCategory').value;
   State.filters.Priority     = document.getElementById('filterPriority').value;
@@ -279,13 +256,11 @@ function applyFilters() {
   State.filters.Status       = document.getElementById('filterStatus').value;
 
   State.filteredDocs = State.allDocs.filter(doc => {
-    // Search filter
     if (State.search) {
       const haystack = [doc.Name, doc.Category, doc.DocumentID, doc.Authority, doc.HolderName]
         .join(' ').toLowerCase();
       if (!haystack.includes(State.search)) return false;
     }
-    // Dropdown filters
     if (State.filters.Category     && doc.Category     !== State.filters.Category)     return false;
     if (State.filters.Priority     && doc.Priority     !== State.filters.Priority)     return false;
     if (State.filters.ExpiryStatus && doc.ExpiryStatus !== State.filters.ExpiryStatus) return false;
@@ -296,7 +271,6 @@ function applyFilters() {
   renderDocumentTable();
 }
 
-/** Reset all filter dropdowns */
 function clearFilters() {
   ['filterCategory','filterPriority','filterExpiry','filterStatus'].forEach(id => {
     document.getElementById(id).value = '';
@@ -305,7 +279,6 @@ function clearFilters() {
   applyFilters();
 }
 
-/** Populate Category dropdown from data */
 function populateFilterDropdowns() {
   const categories = [...new Set(State.allDocs.map(d => d.Category))].sort();
   const sel = document.getElementById('filterCategory');
@@ -319,11 +292,6 @@ function populateFilterDropdowns() {
 /* ════════════════════════════════════════
    MODULE 11 – SORTING
 ════════════════════════════════════════ */
-
-/**
- * Sort filteredDocs by column key.
- * Toggles direction if same column clicked again.
- */
 function sortTable(key) {
   if (State.sortKey === key) {
     State.sortDir = State.sortDir === 'asc' ? 'desc' : 'asc';
@@ -332,7 +300,6 @@ function sortTable(key) {
     State.sortDir = 'asc';
   }
 
-  // Update header indicators
   document.querySelectorAll('.doc-table th').forEach(th => {
     th.classList.remove('sort-asc', 'sort-desc');
     if (th.dataset.col === key) {
@@ -345,7 +312,6 @@ function sortTable(key) {
   State.filteredDocs.sort((a, b) => {
     let va = a[key] || '';
     let vb = b[key] || '';
-    // Numeric sort for DocumentID
     if (key === 'DocumentID') { va = parseInt(va); vb = parseInt(vb); }
     else { va = va.toString().toLowerCase(); vb = vb.toString().toLowerCase(); }
     if (va < vb) return State.sortDir === 'asc' ? -1 :  1;
@@ -359,26 +325,20 @@ function sortTable(key) {
 /* ════════════════════════════════════════
    MODULE 12 – DASHBOARD RENDER
 ════════════════════════════════════════ */
-
 function renderDashboard() {
   const docs = State.allDocs;
-
-  // Stat card counts
   document.getElementById('statTotal').textContent   = docs.length;
   document.getElementById('statHigh').textContent    = docs.filter(d => d.Priority === 'High').length;
   document.getElementById('statSoon').textContent    = docs.filter(d => d.ExpiryStatus === 'Expiring Soon').length;
   document.getElementById('statExpired').textContent = docs.filter(d => d.ExpiryStatus === 'Expired').length;
-
   renderCharts();
   renderRecentList();
   renderQuickAlerts();
 }
 
-/** Build sidebar category pills */
 function buildCategoryPills() {
   const container = document.getElementById('categoryPills');
   const categories = [...new Set(State.allDocs.map(d => d.Category))].sort();
-
   container.innerHTML = categories.map(cat => {
     const count = State.allDocs.filter(d => d.Category === cat).length;
     const color = CATEGORY_COLORS[cat] || '#64748b';
@@ -391,7 +351,6 @@ function buildCategoryPills() {
   }).join('');
 }
 
-/** Render recently updated documents (top 5 by LastUpdate) */
 function renderRecentList() {
   const sorted = [...State.allDocs]
     .filter(d => d.LastUpdate)
@@ -412,7 +371,6 @@ function renderRecentList() {
     </li>`).join('');
 }
 
-/** Render quick alerts (expired + expiring) in dashboard */
 function renderQuickAlerts() {
   const urgent = State.allDocs.filter(d =>
     d.ExpiryStatus === 'Expired' || d.ExpiryStatus === 'Expiring Soon'
@@ -439,7 +397,6 @@ function renderQuickAlerts() {
     </li>`).join('');
 }
 
-/** Update sidebar nav badges */
 function updateBadges() {
   document.getElementById('totalBadge').textContent = State.allDocs.length;
   const urgent = State.allDocs.filter(d =>
@@ -453,8 +410,6 @@ function updateBadges() {
 /* ════════════════════════════════════════
    MODULE 13 – CHARTS
 ════════════════════════════════════════ */
-
-/** Shared chart defaults: reads current theme CSS variables */
 function getChartDefaults() {
   const styles = getComputedStyle(document.documentElement);
   return {
@@ -476,7 +431,6 @@ function destroyCharts() {
   State.charts = {};
 }
 
-/** Pie chart: Documents by Category */
 function renderCategoryChart() {
   const ctx = document.getElementById('categoryChart');
   if (!ctx) return;
@@ -502,7 +456,6 @@ function renderCategoryChart() {
   });
 }
 
-/** Bar chart: Documents by Priority */
 function renderPriorityChart() {
   const ctx = document.getElementById('priorityChart');
   if (!ctx) return;
@@ -530,20 +483,17 @@ function renderPriorityChart() {
   });
 }
 
-/** Line/bar chart: Upcoming expiries by month */
 function renderExpiryTimeline() {
   const ctx = document.getElementById('expiryChart');
   if (!ctx) return;
   if (State.charts.expiry) State.charts.expiry.destroy();
 
-  // Collect docs with future expiry dates
   const now = new Date();
   const upcoming = State.allDocs
     .filter(d => d.ExpiryDate && new Date(d.ExpiryDate) > now)
     .map(d => ({ name: d.Name, date: new Date(d.ExpiryDate) }))
     .sort((a, b) => a.date - b.date);
 
-  // Group by Year-Month
   const monthMap = {};
   upcoming.forEach(({ date }) => {
     const key = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
@@ -580,8 +530,9 @@ function renderExpiryTimeline() {
 
 /* ════════════════════════════════════════
    MODULE 14 – DOCUMENT TABLE RENDER
+   Table is now compact (fewer columns).
+   Hidden cols are shown in modal.
 ════════════════════════════════════════ */
-
 function renderDocumentTable() {
   const tbody   = document.getElementById('docTableBody');
   const docs    = State.filteredDocs;
@@ -591,7 +542,7 @@ function renderDocumentTable() {
 
   if (docs.length === 0) {
     tbody.innerHTML = `
-      <tr><td colspan="11">
+      <tr><td colspan="8">
         <div class="empty-state">
           <i class="ph-duotone ph-magnifying-glass"></i>
           <p>No documents found</p>
@@ -606,27 +557,34 @@ function renderDocumentTable() {
                    : doc.ExpiryStatus === 'Expiring Soon' ? 'row-expiring'
                    : doc.Priority === 'High' ? 'row-high-priority' : '';
 
-    const docNumDisplay = State.sensitive
-      ? `<span class="sensitive-hidden">••••••••</span>`
-      : escapeHtml(doc.DocumentNumber || '–');
+    // Count available downloads
+    const dlCount = doc.GDrive ? Object.keys(doc.GDrive).length : 0;
+    const dlBadge = dlCount > 0
+      ? `<span class="dl-count-badge"><i class="ph-bold ph-download-simple"></i> ${dlCount}</span>`
+      : `<span class="dl-count-badge empty">–</span>`;
 
     return `
     <tr class="${rowClass}" onclick="openModal('${doc.DocumentID}')">
       <td class="doc-id">${doc.DocumentID}</td>
-      <td><strong>${escapeHtml(doc.Name)}</strong></td>
+      <td>
+        <div class="doc-name-cell">
+          <strong>${escapeHtml(doc.Name)}</strong>
+          <span class="doc-type-sub">${escapeHtml(doc.Type || '')}</span>
+        </div>
+      </td>
       <td><span class="cat-chip" style="background:${hexWithAlpha(CATEGORY_COLORS[doc.Category]||'#64748b',0.15)};color:${CATEGORY_COLORS[doc.Category]||'#64748b'};">${escapeHtml(doc.Category)}</span></td>
       <td><span class="priority-badge ${doc.Priority}">${priorityDot(doc.Priority)} ${doc.Priority}</span></td>
       <td><span class="status-badge ${doc.Status}">${doc.Status}</span></td>
-      <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(doc.Authority)}">${escapeHtml(doc.Authority)}</td>
-      <td class="sensitive-field" style="font-family:var(--font-mono);font-size:12px;">${docNumDisplay}</td>
-      <td>${escapeHtml(doc.HolderName)}</td>
       <td>${doc.ExpiryDate ? formatDate(doc.ExpiryDate) : '<span style="color:var(--text-muted)">–</span>'}</td>
       <td><span class="expiry-badge ${expiryClass(doc.ExpiryStatus)}">${expiryIcon(doc.ExpiryStatus)} ${doc.ExpiryStatus}</span></td>
       <td onclick="event.stopPropagation()">
         <div class="action-btns">
-          <button class="act-btn" title="View" onclick="openModal('${doc.DocumentID}')">
+          <button class="act-btn" title="View Details" onclick="openModal('${doc.DocumentID}')">
             <i class="ph-duotone ph-eye"></i>
           </button>
+          ${dlCount > 0 ? `<button class="act-btn dl-btn" title="Downloads available" onclick="openModal('${doc.DocumentID}')">
+            <i class="ph-duotone ph-download-simple"></i>
+          </button>` : ''}
         </div>
       </td>
     </tr>`;
@@ -636,7 +594,6 @@ function renderDocumentTable() {
 /* ════════════════════════════════════════
    MODULE 15 – ALERTS PAGE RENDER
 ════════════════════════════════════════ */
-
 function renderAlerts() {
   const expired  = State.allDocs.filter(d => d.ExpiryStatus === 'Expired');
   const expiring = State.allDocs.filter(d => d.ExpiryStatus === 'Expiring Soon');
@@ -696,8 +653,8 @@ function renderAlertCards(containerId, docs, type) {
 
 /* ════════════════════════════════════════
    MODULE 16 – DOCUMENT DETAIL MODAL
+   Now includes the Download Panel section.
 ════════════════════════════════════════ */
-
 function openModal(docId) {
   const doc = State.allDocs.find(d => d.DocumentID === docId);
   if (!doc) return;
@@ -709,8 +666,45 @@ function openModal(docId) {
   document.getElementById('modalCat').style.cssText =
     `background:${hexWithAlpha(catColor,0.15)};color:${catColor};`;
 
-  // Decide whether to show sensitive fields based on State.sensitive
   const showNum = !State.sensitive;
+
+  // ── Build Download Panel HTML ──────────────────────────────
+  let downloadPanelHTML = '';
+  if (doc.GDrive && Object.keys(doc.GDrive).length > 0) {
+    const pdfKeys = Object.keys(doc.GDrive).filter(k => k.startsWith('pdf'));
+    const jpgKeys = Object.keys(doc.GDrive).filter(k => k.startsWith('jpg'));
+
+    const buildGroup = (keys, groupLabel, groupColor, groupIcon) => {
+      if (keys.length === 0) return '';
+      const btns = keys.map(key => {
+        const meta = GDRIVE_META[key] || { label: key, icon: 'ph-file', size: key };
+        return `
+          <a href="${escapeHtml(doc.GDrive[key])}" target="_blank" rel="noopener"
+             class="dl-pill" title="Download ${meta.label}">
+            <i class="ph-duotone ${meta.icon}"></i>
+            <span class="dl-pill-size">${meta.size}</span>
+          </a>`;
+      }).join('');
+      return `
+        <div class="dl-group">
+          <div class="dl-group-label">
+            <i class="ph-bold ${groupIcon}" style="color:${groupColor};"></i>
+            ${groupLabel}
+          </div>
+          <div class="dl-pills">${btns}</div>
+        </div>`;
+    };
+
+    downloadPanelHTML = `
+      <div class="modal-section-title"><i class="ph-bold ph-download-simple" style="margin-right:5px;"></i> Download Files</div>
+      <div class="modal-field full">
+        <label>Available formats from Google Drive</label>
+        <div class="download-panel">
+          ${buildGroup(pdfKeys, 'PDF', '#ef4444', 'ph-file-pdf')}
+          ${buildGroup(jpgKeys, 'JPG / Image', '#3b82f6', 'ph-file-image')}
+        </div>
+      </div>`;
+  }
 
   document.getElementById('modalBody').innerHTML = `
     <div class="modal-grid">
@@ -801,6 +795,8 @@ function openModal(docId) {
         <label>Notes / Google Drive Links</label>
         <div class="field-val" style="white-space:pre-wrap;">${escapeHtml(doc.Notes)}</div>
       </div>` : ''}
+
+      ${downloadPanelHTML}
     </div>`;
 
   document.getElementById('modalBackdrop').classList.add('open');
@@ -817,7 +813,6 @@ function closeModal() {
 /* ════════════════════════════════════════
    MODULE 17 – EXPORT CSV
 ════════════════════════════════════════ */
-
 function exportCSV() {
   const cols = [
     'DocumentID','Name','Category','Priority','Status','Authority',
@@ -847,11 +842,6 @@ function exportCSV() {
 /* ════════════════════════════════════════
    MODULE 18 – HELPERS & UTILITIES
 ════════════════════════════════════════ */
-
-/**
- * Format a date string to human-readable DD MMM YYYY
- * @param {string} dateStr
- */
 function formatDate(dateStr) {
   if (!dateStr) return '–';
   try {
@@ -861,7 +851,6 @@ function formatDate(dateStr) {
   } catch { return dateStr; }
 }
 
-/** Returns CSS class string for an expiry badge */
 function expiryClass(status) {
   const map = {
     'Valid':          'Valid',
@@ -872,7 +861,6 @@ function expiryClass(status) {
   return map[status] || '';
 }
 
-/** Returns an icon string for expiry status */
 function expiryIcon(status) {
   const icons = {
     'Valid':         '✓',
@@ -883,12 +871,10 @@ function expiryIcon(status) {
   return icons[status] || '';
 }
 
-/** Returns a dot emoji for priority */
 function priorityDot(p) {
   return p === 'High' ? '🔴' : p === 'Medium' ? '🟡' : '🟢';
 }
 
-/** XSS-safe HTML escaping */
 function escapeHtml(str) {
   if (!str) return '';
   return str.toString()
@@ -898,11 +884,6 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-/**
- * Convert a hex color to rgba with given alpha
- * @param {string} hex – '#0d9488'
- * @param {number} alpha – 0 to 1
- */
 function hexWithAlpha(hex, alpha) {
   const r = parseInt(hex.slice(1,3),16);
   const g = parseInt(hex.slice(3,5),16);
@@ -914,9 +895,7 @@ function hexWithAlpha(hex, alpha) {
    KEYBOARD SHORTCUTS
 ════════════════════════════════════════ */
 document.addEventListener('keydown', e => {
-  // ESC → close modal
   if (e.key === 'Escape') closeModal();
-  // Ctrl+K → focus search
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
     e.preventDefault();
     document.getElementById('globalSearch').focus();
